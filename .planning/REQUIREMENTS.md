@@ -16,19 +16,19 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Telemetry Module (Invoke-TelemetryBlock)
 
-- [ ] **TELM-01**: Script can set AllowTelemetry to 0 in DataCollection policy key
-- [ ] **TELM-02**: Script can disable AutoLogger ETW sessions (AutoLogger-Diagtrack-Listener, DiagLog, SQMLogger)
-- [ ] **TELM-03**: Script can stop and disable DiagTrack and dmwappushservice services
-- [ ] **TELM-04**: Script can disable telemetry scheduled tasks (CompatibilityAppraiser, ProgramDataUpdater, Consolidator, UsbCeip)
-- [ ] **TELM-05**: Module records prior state of all values to rollback manifest
+- [x] **TELM-01**: Script can set AllowTelemetry to 0 in DataCollection policy key
+- [x] **TELM-02**: Script can disable AutoLogger ETW sessions (AutoLogger-Diagtrack-Listener, DiagLog, SQMLogger)
+- [x] **TELM-03**: Script can stop and disable DiagTrack and dmwappushservice services
+- [x] **TELM-04**: Script can disable telemetry scheduled tasks (CompatibilityAppraiser, ProgramDataUpdater, Consolidator, UsbCeip)
+- [x] **TELM-05**: Module records prior state of all values to rollback manifest
 
 ### GPU & DWM Module (Invoke-GpuDwmOptimize)
 
-- [ ] **GPUD-01**: Script can enable Hardware-Accelerated GPU Scheduling via HwSchMode = 2
-- [ ] **GPUD-02**: Script can disable Multi-Plane Overlay via DWM OverlayTestMode = 5
-- [ ] **GPUD-03**: Script can detect Nvidia GPU presence via WMI and output NVCP manual configuration checklist
-- [ ] **GPUD-04**: Script can disable NvTelemetryContainer service
-- [ ] **GPUD-05**: Script validates HAGS activation post-reboot via registry readback
+- [x] **GPUD-01**: Script can enable Hardware-Accelerated GPU Scheduling via HwSchMode = 2
+- [x] **GPUD-02**: Script can disable Multi-Plane Overlay via DWM OverlayTestMode = 5
+- [x] **GPUD-03**: Script can detect Nvidia GPU presence via WMI and output NVCP manual configuration checklist
+- [x] **GPUD-04**: Script can disable NvTelemetryContainer service
+- [x] **GPUD-05**: Script validates HAGS activation post-reboot via registry readback
 
 ### CPU Scheduler Module (Invoke-SchedulerOptimize)
 
@@ -173,16 +173,16 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| TELM-01 | Phase 3 | Pending |
-| TELM-02 | Phase 3 | Pending |
-| TELM-03 | Phase 3 | Pending |
-| TELM-04 | Phase 3 | Pending |
-| TELM-05 | Phase 3 | Pending |
-| GPUD-01 | Phase 3 | Pending |
-| GPUD-02 | Phase 3 | Pending |
-| GPUD-03 | Phase 3 | Pending |
-| GPUD-04 | Phase 3 | Pending |
-| GPUD-05 | Phase 3 | Pending |
+| TELM-01 | Phase 3 | Complete |
+| TELM-02 | Phase 3 | Complete |
+| TELM-03 | Phase 3 | Complete |
+| TELM-04 | Phase 3 | Complete |
+| TELM-05 | Phase 3 | Complete |
+| GPUD-01 | Phase 3 | Complete |
+| GPUD-02 | Phase 3 | Complete |
+| GPUD-03 | Phase 3 | Complete |
+| GPUD-04 | Phase 3 | Complete |
+| GPUD-05 | Phase 3 | Complete |
 | SRVC-01 | Phase 3 | Complete |
 | SRVC-02 | Phase 3 | Complete |
 | SRVC-03 | Phase 3 | Complete |

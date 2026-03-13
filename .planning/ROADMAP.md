@@ -13,7 +13,7 @@
 |-------|----------------|--------|-----------|
 | 1. Foundation & Libraries | 2/3 + 1 gap closure | Complete    | 2026-03-13 |
 | 2. Safety Gates | 0/2 | Not started | - |
-| 3. Core Modules | 0/3 | Not started | - |
+| 3. Core Modules | 3/3 | Complete   | 2026-03-13 |
 | 4. Power & Scheduler | 0/2 | Not started | - |
 | 5. File System & Rollback | 0/2 | Not started | - |
 | 6. Entry Point & CLI | 0/2 | Not started | - |
@@ -25,7 +25,7 @@
 
 - [x] **Phase 1: Foundation & Libraries** - Repository structure, library helpers, and configuration files (completed 2026-03-13)
 - [ ] **Phase 2: Safety Gates** - Pre-flight validation and safety infrastructure
-- [ ] **Phase 3: Core Modules** - Telemetry, Services, and GPU/DWM optimization modules
+- [x] **Phase 3: Core Modules** - Telemetry, Services, and GPU/DWM optimization modules (completed 2026-03-13)
 - [ ] **Phase 4: Power & Scheduler** - Power Plan and CPU Scheduler optimization modules
 - [ ] **Phase 5: File System & Rollback** - File System optimization and Rollback module
 - [ ] **Phase 6: Entry Point & CLI** - Main entry point, interactive menu, and CLI interface
@@ -92,7 +92,7 @@
 4. All modules record prior state to rollback manifest before making changes
 5. All modules emit structured JSONL log entries for every operation
 
-**Plans:** 3 plans
+**Plans:** 3/3 plans complete
 - [ ] 03-01-PLAN.md — Telemetry suppression module (TELM-01 through TELM-05)
 - [ ] 03-02-PLAN.md — GPU/DWM optimization module (GPUD-01 through GPUD-05)
 - [ ] 03-03-PLAN.md — Service optimization module (SRVC-01 through SRVC-05)

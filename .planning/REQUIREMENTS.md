@@ -109,9 +109,9 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Repository Structure & Documentation
 
-- [ ] **REPO-01**: Repository matches exact structure from PRD Section 3.1 (all directories and files exist)
+- [x] **REPO-01**: Repository matches exact structure from PRD Section 3.1 (all directories and files exist)
 - [ ] **REPO-02**: README.md follows structure defined in PRD Section 3.5
-- [ ] **REPO-03**: config/services.json contains Disabled list, Manual list, and OEM entries (Armory Crate, Lenovo Vantage, Dell Command, HP Omen)
+- [x] **REPO-03**: config/services.json contains Disabled list, Manual list, and OEM entries (Armory Crate, Lenovo Vantage, Dell Command, HP Omen)
 - [ ] **REPO-04**: tests/ directory contains Pester stubs for Test-Modules.ps1 and Test-Rollback.ps1
 - [ ] **REPO-05**: CONTRIBUTING.md documents PR guidelines, module addition template, test requirements, code style ban on backtick continuation
 - [ ] **REPO-06**: CHANGELOG.md includes v1.0.0 initial release entry
@@ -152,8 +152,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| REPO-01 | Phase 1 | Pending |
-| REPO-03 | Phase 1 | Pending |
+| REPO-01 | Phase 1 | Complete |
+| REPO-03 | Phase 1 | Complete |
 | LIBR-01 | Phase 1 | Pending |
 | LIBR-02 | Phase 1 | Pending |
 | LIBR-03 | Phase 1 | Pending |

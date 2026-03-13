@@ -11,7 +11,7 @@
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation & Libraries | 0/2 | Not started | - |
+| 1. Foundation & Libraries | 2/2 | Planned | - |
 | 2. Safety Gates | 0/2 | Not started | - |
 | 3. Core Modules | 0/3 | Not started | - |
 | 4. Power & Scheduler | 0/2 | Not started | - |
@@ -49,7 +49,9 @@
 3. config/services.json contains complete service lists (Disabled, Manual, OEM) for all major vendors
 4. Each library helper can be imported and executed independently with test parameters
 
-**Plans:** TBD
+**Plans:**
+- [ ] 01-01-PLAN.md — Repository structure and services configuration
+- [ ] 01-02-PLAN.md — Library helper functions (5 helpers)
 
 ---
 

@@ -32,22 +32,22 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### CPU Scheduler Module (Invoke-SchedulerOptimize)
 
-- [ ] **SCHD-01**: Script can set Win32PrioritySeparation to 38 (variable quanta, short intervals, 3x foreground boost)
-- [ ] **SCHD-02**: Script can extract active power plan GUID using regex parser (locale-safe)
-- [ ] **SCHD-03**: Script can disable CPU core parking using hardcoded GUIDs (SubGroup 54533251-82be-4824-96c1-47b60b740d00, Setting 0cc5b647-c1df-4637-891a-dec35c318583 = 100)
-- [ ] **SCHD-04**: Script can set minimum and maximum processor state to 100% on AC power
-- [ ] **SCHD-05**: Script can detect and configure network adapter interrupt moderation
+- [x] **SCHD-01**: Script can set Win32PrioritySeparation to 38 (variable quanta, short intervals, 3x foreground boost)
+- [x] **SCHD-02**: Script can extract active power plan GUID using regex parser (locale-safe)
+- [x] **SCHD-03**: Script can disable CPU core parking using hardcoded GUIDs (SubGroup 54533251-82be-4824-96c1-47b60b740d00, Setting 0cc5b647-c1df-4637-891a-dec35c318583 = 100)
+- [x] **SCHD-04**: Script can set minimum and maximum processor state to 100% on AC power
+- [x] **SCHD-05**: Script can detect and configure network adapter interrupt moderation
 
 ### Power Plan Module (Invoke-PowerPlanConfig)
 
-- [ ] **PWRP-01**: Script can detect Modern Standby (S0) state via PlatformAoAcOverride registry key
-- [ ] **PWRP-02**: Script can apply PlatformAoAcOverride = 0 if S0 detected and prompt user for required reboot
-- [ ] **PWRP-03**: Script can duplicate and activate Ultimate Performance plan (e9a42b02-d5df-448d-aa00-03f14749eb61)
-- [ ] **PWRP-04**: Script can rename plan to custom label to prevent OEM GUID collision
-- [ ] **PWRP-05**: Script can set PCIe Link State Power Management to Off (GUID: 501a4d13-42af-4429-9fd1-a8218c268e20)
-- [ ] **PWRP-06**: Script can set USB Selective Suspend to Disabled
-- [ ] **PWRP-07**: Script can detect OEM power management services (Armory Crate, Lenovo Vantage, Dell Command, HP Omen)
-- [ ] **PWRP-08**: Script can create scheduled task to reapply plan post-login if OEM service detected
+- [x] **PWRP-01**: Script can detect Modern Standby (S0) state via PlatformAoAcOverride registry key
+- [x] **PWRP-02**: Script can apply PlatformAoAcOverride = 0 if S0 detected and prompt user for required reboot
+- [x] **PWRP-03**: Script can duplicate and activate Ultimate Performance plan (e9a42b02-d5df-448d-aa00-03f14749eb61)
+- [x] **PWRP-04**: Script can rename plan to custom label to prevent OEM GUID collision
+- [x] **PWRP-05**: Script can set PCIe Link State Power Management to Off (GUID: 501a4d13-42af-4429-9fd1-a8218c268e20)
+- [x] **PWRP-06**: Script can set USB Selective Suspend to Disabled
+- [x] **PWRP-07**: Script can detect OEM power management services (Armory Crate, Lenovo Vantage, Dell Command, HP Omen)
+- [x] **PWRP-08**: Script can create scheduled task to reapply plan post-login if OEM service detected
 
 ### File System Module (Invoke-FileSystemOptimize)
 
@@ -193,19 +193,19 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| SCHD-01 | Phase 4 | Pending |
-| SCHD-02 | Phase 4 | Pending |
-| SCHD-03 | Phase 4 | Pending |
-| SCHD-04 | Phase 4 | Pending |
-| SCHD-05 | Phase 4 | Pending |
-| PWRP-01 | Phase 4 | Pending |
-| PWRP-02 | Phase 4 | Pending |
-| PWRP-03 | Phase 4 | Pending |
-| PWRP-04 | Phase 4 | Pending |
-| PWRP-05 | Phase 4 | Pending |
-| PWRP-06 | Phase 4 | Pending |
-| PWRP-07 | Phase 4 | Pending |
-| PWRP-08 | Phase 4 | Pending |
+| SCHD-01 | Phase 4 | Complete |
+| SCHD-02 | Phase 4 | Complete |
+| SCHD-03 | Phase 4 | Complete |
+| SCHD-04 | Phase 4 | Complete |
+| SCHD-05 | Phase 4 | Complete |
+| PWRP-01 | Phase 4 | Complete |
+| PWRP-02 | Phase 4 | Complete |
+| PWRP-03 | Phase 4 | Complete |
+| PWRP-04 | Phase 4 | Complete |
+| PWRP-05 | Phase 4 | Complete |
+| PWRP-06 | Phase 4 | Complete |
+| PWRP-07 | Phase 4 | Complete |
+| PWRP-08 | Phase 4 | Complete |
 
 ### Phase 5: File System & Rollback
 

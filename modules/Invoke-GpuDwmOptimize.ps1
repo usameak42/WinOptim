@@ -159,9 +159,164 @@ function Invoke-GpuDwmOptimize {
         #endregion
 
         #region Stage 2: HAGS Configuration
+        Write-Host "[ACTION] Enabling Hardware-Accelerated GPU Scheduling..." -ForegroundColor Cyan
+
+        $regPath = "HKLM:\SYSTEM\CurrentControlSet\Control\GraphicsDrivers"
+        $valueName = "HwSchMode"
+        $desiredValue = 2
+
+        # Check current state
+        $currentHags = Get-ItemProperty -Path $regPath -Name $valueName -ErrorAction SilentlyContinue
+
+        # CONTEXT: HAGS Checks - Check registry value + driver capability validation
+        if ($null -ne $currentHags -and $currentHags.$valueName -eq $desiredValue) {
+            Write-Host "[SKIP] HAGS already enabled" -ForegroundColor Gray
+
+            Write-OptLog -Module "Invoke-GpuDwmOptimize" `
+                -Operation "Get-ItemProperty" `
+                -Target "$regPath\$valueName" `
+                -Values @{ CurrentValue = $currentHags.$valueName; DesiredValue = $desiredValue } `
+                -Result "Skip" `
+                -Message "HAGS already enabled" `
+                -Level "SKIP"
+
+            $skipCount++
+        } else {
+            try {
+                # Save rollback entry BEFORE modification
+                Save-RollbackEntry -Type "Registry" `
+                    -Target $regPath `
+                    -ValueName $valueName `
+                    -OriginalData $currentHags.$valueName `
+                    -OriginalType "REG_DWORD"
+
+                # Enable HAGS
+                Set-ItemProperty -Path $regPath -Name $valueName -Value $desiredValue -Type DWord -ErrorAction Stop
+
+                Write-Host "[SUCCESS] HAGS enabled (requires reboot to activate)" -ForegroundColor Green
+
+                Write-OptLog -Module "Invoke-GpuDwmOptimize" `
+                    -Operation "Set-ItemProperty" `
+                    -Target "$regPath\$valueName" `
+                    -Values @{ OldValue = $currentHags.$valueName; NewValue = $desiredValue } `
+                    -Result "Success" `
+                    -Message "Hardware-Accelerated GPU Scheduling enabled" `
+                    -Level "SUCCESS"
+
+                $successCount++
+
+                # CONTEXT: HAGS Reboot - Prompt user
+                $reboot = Read-Host -Prompt "Reboot now to activate HAGS? (Y/N)"
+                if ($reboot -eq 'Y' -or $reboot -eq 'y') {
+                    Write-Host "[INFO] Restart-Computer would be called here (deferred to entry point)" -ForegroundColor Cyan
+                    # Don't actually reboot - let entry point handle it
+                    Write-Host "[WARNING] HAGS will not be active until reboot" -ForegroundColor Yellow
+                } else {
+                    Write-Host "[WARNING] HAGS will not be active until reboot" -ForegroundColor Yellow
+
+                    Write-OptLog -Module "Invoke-GpuDwmOptimize" `
+                        -Operation "Set-ItemProperty" `
+                        -Target "$regPath\$valueName" `
+                        -Values @{} `
+                        -Result "Warning" `
+                        -Message "HAGS enabled but requires reboot to activate" `
+                        -Level "WARNING"
+                }
+            } catch {
+                Write-Host "[ERROR] Failed to enable HAGS: $_" -ForegroundColor Red
+                Write-Host "[INFO] Your GPU driver may not support HAGS" -ForegroundColor Cyan
+
+                Write-OptLog -Module "Invoke-GpuDwmOptimize" `
+                    -Operation "Set-ItemProperty" `
+                    -Target "$regPath\$valueName" `
+                    -Values @{ Error = $_.Exception.Message } `
+                    -Result "Error" `
+                    -Message "Failed to enable HAGS (driver may not support it)" `
+                    -Level "ERROR"
+
+                # CONTEXT: GPU Optimization Step Failure - Prompt user to skip or halt
+                $continue = Read-Host -Prompt "Skip HAGS and continue with MPO? (Y/N)"
+                if ($continue -ne 'Y' -and $continue -ne 'y') {
+                    Write-Host "[ERROR] Halting GPU module per user choice" -ForegroundColor Red
+                    return $false
+                }
+                $errorCount++
+            }
+        }
         #endregion
 
         #region Stage 3: MPO Configuration
+        Write-Host "[ACTION] Disabling Multi-Plane Overlay..." -ForegroundColor Cyan
+
+        $dwmPath = "HKLM:\SOFTWARE\Microsoft\Windows\Dwm"
+        $mpoValue = "OverlayTestMode"
+        $desiredMpo = 5
+
+        # CONTEXT: MPO Checks - Check registry value + verify system state
+        $currentMpo = Get-ItemProperty -Path $dwmPath -Name $mpoValue -ErrorAction SilentlyContinue
+
+        if ($null -eq $currentMpo) {
+            # CONTEXT: MPO Key Missing - Log WARNING (expected on older Windows)
+            Write-Host "[WARNING] MPO registry key not found (expected on older Windows versions)" -ForegroundColor Yellow
+
+            Write-OptLog -Module "Invoke-GpuDwmOptimize" `
+                -Operation "Get-ItemProperty" `
+                -Target "$dwmPath\$mpoValue" `
+                -Values @{} `
+                -Result "Warning" `
+                -Message "MPO key not found, may not be supported on this Windows version" `
+                -Level "WARNING"
+
+            $warningCount++
+        } elseif ($currentMpo.$mpoValue -eq $desiredMpo) {
+            Write-Host "[SKIP] MPO already disabled" -ForegroundColor Gray
+
+            Write-OptLog -Module "Invoke-GpuDwmOptimize" `
+                -Operation "Get-ItemProperty" `
+                -Target "$dwmPath\$mpoValue" `
+                -Values @{ CurrentValue = $currentMpo.$mpoValue; DesiredValue = $desiredMpo } `
+                -Result "Skip" `
+                -Message "MPO already disabled" `
+                -Level "SKIP"
+
+            $skipCount++
+        } else {
+            try {
+                # Save rollback entry
+                Save-RollbackEntry -Type "Registry" `
+                    -Target $dwmPath `
+                    -ValueName $mpoValue `
+                    -OriginalData $currentMpo.$mpoValue `
+                    -OriginalType "REG_DWORD"
+
+                # Disable MPO
+                Set-ItemProperty -Path $dwmPath -Name $mpoValue -Value $desiredMpo -Type DWord -ErrorAction Stop
+
+                Write-Host "[SUCCESS] MPO disabled" -ForegroundColor Green
+
+                Write-OptLog -Module "Invoke-GpuDwmOptimize" `
+                    -Operation "Set-ItemProperty" `
+                    -Target "$dwmPath\$mpoValue" `
+                    -Values @{ OldValue = $currentMpo.$mpoValue; NewValue = $desiredMpo } `
+                    -Result "Success" `
+                    -Message "Multi-Plane Overlay disabled" `
+                    -Level "SUCCESS"
+
+                $successCount++
+            } catch {
+                Write-Host "[ERROR] Failed to disable MPO: $_" -ForegroundColor Red
+
+                Write-OptLog -Module "Invoke-GpuDwmOptimize" `
+                    -Operation "Set-ItemProperty" `
+                    -Target "$dwmPath\$mpoValue" `
+                    -Values @{ Error = $_.Exception.Message } `
+                    -Result "Error" `
+                    -Message "Failed to disable MPO" `
+                    -Level "ERROR"
+
+                $errorCount++
+            }
+        }
         #endregion
 
         #region Stage 4: Vendor Optimizations

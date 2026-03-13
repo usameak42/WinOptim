@@ -11,7 +11,7 @@
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation & Libraries | 2/2 | Planned | - |
+| 1. Foundation & Libraries | 2/3 + 1 gap closure | Planned | - |
 | 2. Safety Gates | 0/2 | Not started | - |
 | 3. Core Modules | 0/3 | Not started | - |
 | 4. Power & Scheduler | 0/2 | Not started | - |
@@ -52,6 +52,7 @@
 **Plans:**
 - [ ] 01-01-PLAN.md — Repository structure and services configuration
 - [ ] 01-02-PLAN.md — Library helper functions (5 helpers)
+- [ ] 01-03-PLAN.md — Gap closure: GitHub issue template placeholders
 
 ---
 

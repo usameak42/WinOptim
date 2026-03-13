@@ -1,0 +1,19 @@
+# Sensitive files
+*.token
+*.pat
+.github_token
+.env
+
+# Windows
+Thumbs.db
+desktop.ini
+
+# PowerShell
+*.ps1xml
+
+# Logs
+*.log
+
+# IDE
+.vscode/
+.idea/

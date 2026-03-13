@@ -320,9 +320,169 @@ function Invoke-GpuDwmOptimize {
         #endregion
 
         #region Stage 4: Vendor Optimizations
+        if ($selectedGpus.Count -gt 0 -and -not $fallbackMode) {
+            foreach ($gpu in $selectedGpus) {
+                $gpuName = $gpu.Name
+
+                # CONTEXT: Unknown GPU Vendor
+                $isNvidia = $gpuName -like '*NVIDIA*'
+                $isAmd = $gpuName -like '*AMD*' -or $gpuName -like '*Radeon*'
+                $isIntel = $gpuName -like '*Intel*'
+
+                if (-not $isNvidia -and -not $isAmd -and -not $isIntel) {
+                    Write-Host "[WARNING] Unknown GPU vendor: $gpuName" -ForegroundColor Yellow
+                    $choice = Read-Host -Prompt "Apply generic optimizations, skip vendor-specific, or halt? (G/S/H)"
+
+                    if ($choice -eq 'H' -or $choice -eq 'h') {
+                        Write-Host "[ERROR] Halting GPU module per user choice" -ForegroundColor Red
+                        return $false
+                    } elseif ($choice -eq 'S' -or $choice -eq 's') {
+                        Write-Host "[SKIP] Skipping vendor-specific optimizations for $gpuName" -ForegroundColor Gray
+                        continue
+                    }
+                    # else: apply generic optimizations (HAGS/MPO already applied)
+                }
+
+                # CONTEXT: Nvidia GPU - Prompt for vendor-specific optimizations
+                if ($isNvidia) {
+                    Write-Host "[INFO] Nvidia GPU detected: $gpuName" -ForegroundColor Cyan
+                    $nvidiaOpt = Read-Host -Prompt "Apply Nvidia-specific optimizations? (Y/N)"
+
+                    if ($nvidiaOpt -eq 'Y' -or $nvidiaOpt -eq 'y') {
+                        # GPUD-04: Disable NvTelemetryContainer service
+                        $nvTelemetry = Get-Service -Name 'NvTelemetryContainer' -ErrorAction SilentlyContinue
+
+                        if ($null -ne $nvTelemetry) {
+                            # Get current state
+                            $currentStartType = (Get-WmiObject -Class Win32_Service -Filter "Name='NvTelemetryContainer'").StartMode
+                            $currentStatus = $nvTelemetry.Status
+
+                            # Idempotency check
+                            if ($currentStartType -ne 'Disabled' -or $currentStatus -ne 'Stopped') {
+                                Write-Host "[ACTION] Disabling NvTelemetryContainer service..." -ForegroundColor Cyan
+
+                                # Save rollback entry
+                                Save-RollbackEntry -Type "Service" `
+                                    -Target 'NvTelemetryContainer' `
+                                    -OriginalStartType $currentStartType
+
+                                # Stop service
+                                if ($nvTelemetry.Status -ne 'Stopped') {
+                                    try {
+                                        Stop-Service -Name 'NvTelemetryContainer' -Force -ErrorAction Stop
+                                        Write-Host "[SUCCESS] Stopped NvTelemetryContainer" -ForegroundColor Green
+                                    } catch {
+                                        Write-Host "[WARNING] Failed to stop NvTelemetryContainer: $_" -ForegroundColor Yellow
+                                    }
+                                }
+
+                                # Disable service
+                                try {
+                                    Set-Service -Name 'NvTelemetryContainer' -StartupType Disabled -ErrorAction Stop
+                                    Write-Host "[SUCCESS] Disabled NvTelemetryContainer" -ForegroundColor Green
+
+                                    Write-OptLog -Module "Invoke-GpuDwmOptimize" `
+                                        -Operation "Set-Service" `
+                                        -Target 'NvTelemetryContainer' `
+                                        -Values @{ OldStartType = $currentStartType; NewStartType = 'Disabled' } `
+                                        -Result "Success" `
+                                        -Message "Nvidia telemetry service disabled" `
+                                        -Level "SUCCESS"
+
+                                    $successCount++
+                                } catch {
+                                    Write-Host "[ERROR] Failed to disable NvTelemetryContainer: $_" -ForegroundColor Red
+                                    $errorCount++
+                                }
+                            } else {
+                                Write-Host "[SKIP] NvTelemetryContainer already disabled and stopped" -ForegroundColor Gray
+                                $skipCount++
+                            }
+                        } else {
+                            Write-Host "[SKIP] NvTelemetryContainer service not found" -ForegroundColor Gray
+                            $skipCount++
+                        }
+
+                        # GPUD-03: Output NVCP manual configuration checklist
+                        Write-Host "`n[NVIDIA Control Panel Manual Configuration]" -ForegroundColor Yellow
+                        Write-Host "1. Open NVIDIA Control Panel" -ForegroundColor White
+                        Write-Host "2. Go to 'Manage 3D Settings'" -ForegroundColor White
+                        Write-Host "3. Set 'Power management mode' to 'Prefer maximum performance'" -ForegroundColor White
+                        Write-Host "4. Set 'Texture filtering - Quality' to 'High performance'" -ForegroundColor White
+                        Write-Host "5. Set 'Max Frame Rate' to your monitor refresh rate" -ForegroundColor White
+                        Write-Host "6. Set 'Low Latency Mode' to 'Ultra'" -ForegroundColor White
+                        Write-Host "`nThese settings must be configured manually in NVIDIA Control Panel." -ForegroundColor Cyan
+                    } else {
+                        Write-Host "[INFO] Skipping Nvidia-specific optimizations, HAGS-only mode" -ForegroundColor Cyan
+                    }
+                }
+
+                # CONTEXT: AMD GPU - Prompt for vendor-specific optimizations
+                if ($isAmd) {
+                    Write-Host "[INFO] AMD GPU detected: $gpuName" -ForegroundColor Cyan
+                    $amdOpt = Read-Host -Prompt "Apply AMD-specific optimizations? (Y/N)"
+
+                    if ($amdOpt -eq 'Y' -or $amdOpt -eq 'y') {
+                        # AMD-specific optimizations (e.g., Radeon Software settings)
+                        Write-Host "[INFO] AMD GPU optimization checklist:" -ForegroundColor Cyan
+                        Write-Host "1. Open AMD Radeon Software" -ForegroundColor White
+                        Write-Host "2. Go to 'Graphics' -> 'Advanced'" -ForegroundColor White
+                        Write-Host "3. Set 'Tessellation Mode' to 'AMD optimized'" -ForegroundColor White
+                        Write-Host "4. Set 'Radeon Enhanced Sync' to 'On'" -ForegroundColor White
+                        Write-Host "5. Disable 'Radeon Anti-Lag' (adds latency)" -ForegroundColor White
+                        Write-Host "`nThese settings must be configured manually in AMD Radeon Software." -ForegroundColor Cyan
+                    } else {
+                        Write-Host "[INFO] Skipping AMD-specific optimizations" -ForegroundColor Cyan
+                    }
+                }
+
+                # CONTEXT: Intel Integrated GPU - Prompt for optimization
+                if ($isIntel) {
+                    Write-Host "[INFO] Intel integrated GPU detected: $gpuName" -ForegroundColor Cyan
+                    $intelOpt = Read-Host -Prompt "Optimize integrated GPU? (usually skipped alongside discrete) (Y/N)"
+
+                    if ($intelOpt -ne 'Y' -and $intelOpt -ne 'y') {
+                        Write-Host "[INFO] Skipping Intel integrated GPU optimization" -ForegroundColor Cyan
+                        continue
+                    }
+                    # Intel-specific optimizations would go here
+                }
+            }
+        }
         #endregion
 
         #region Stage 5: HAGS Validation
+        # Check if HAGS is actually active (registry readback)
+        $actualHags = Get-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\GraphicsDrivers" -Name "HwSchMode" -ErrorAction SilentlyContinue
+
+        if ($null -ne $actualHags -and $actualHags.HwSchMode -eq 2) {
+            Write-Host "[INFO] HAGS registry value = 2 (enabled)" -ForegroundColor Cyan
+            Write-Host "[WARNING] HAGS requires reboot to activate. If system has not rebooted, HAGS is not yet active." -ForegroundColor Yellow
+
+            Write-OptLog -Module "Invoke-GpuDwmOptimize" `
+                -Operation "Get-ItemProperty" `
+                -Target "HKLM:\SYSTEM\CurrentControlSet\Control\GraphicsDrivers\HwSchMode" `
+                -Values @{ RegistryValue = $actualHags.HwSchMode; Active = $false } `
+                -Result "Warning" `
+                -Message "HAGS registry set but not yet active (requires reboot)" `
+                -Level "WARNING"
+
+            $warningCount++
+        } else {
+            Write-Host "[ERROR] HAGS validation failed - registry value is not 2" -ForegroundColor Red
+
+            Write-OptLog -Module "Invoke-GpuDwmOptimize" `
+                -Operation "Get-ItemProperty" `
+                -Target "HKLM:\SYSTEM\CurrentControlSet\Control\GraphicsDrivers\HwSchMode" `
+                -Values @{ RegistryValue = if ($actualHags) { $actualHags.HwSchMode } else { "null" } } `
+                -Result "Error" `
+                -Message "HAGS validation failed - registry incorrect" `
+                -Level "ERROR"
+
+            # CONTEXT: HAGS Still Disabled (no reboot) - Halt, instruct user to reboot
+            Write-Host "[ERROR] HAGS is not enabled. Please reboot and re-run this module." -ForegroundColor Red
+            $errorCount++
+        }
         #endregion
 
         #region Summary Display

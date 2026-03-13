@@ -77,11 +77,11 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Library Helpers
 
-- [ ] **LIBR-01**: Write-OptLog can write structured JSONL log entries with timestamp, module, operation, target, values, result, message
-- [ ] **LIBR-02**: Get-ActivePlanGuid can extract GUID from powercfg output using regex (locale-safe)
-- [ ] **LIBR-03**: Save-RollbackEntry can append to JSON rollback manifest before any destructive operation
-- [ ] **LIBR-04**: Take-RegistryOwnership can transfer ownership from TrustedInstaller to Administrators via System.Security.AccessControl
-- [ ] **LIBR-05**: Test-VirtStack can validate WSL2/Hyper-V via WMI without calling wsl.exe
+- [x] **LIBR-01**: Write-OptLog can write structured JSONL log entries with timestamp, module, operation, target, values, result, message
+- [x] **LIBR-02**: Get-ActivePlanGuid can extract GUID from powercfg output using regex (locale-safe)
+- [x] **LIBR-03**: Save-RollbackEntry can append to JSON rollback manifest before any destructive operation
+- [x] **LIBR-04**: Take-RegistryOwnership can transfer ownership from TrustedInstaller to Administrators via System.Security.AccessControl
+- [x] **LIBR-05**: Test-VirtStack can validate WSL2/Hyper-V via WMI without calling wsl.exe
 
 ### Entry Point & CLI
 
@@ -154,11 +154,11 @@ Which phases cover which requirements. Updated during roadmap creation.
 |-------------|-------|--------|
 | REPO-01 | Phase 1 | Complete |
 | REPO-03 | Phase 1 | Complete |
-| LIBR-01 | Phase 1 | Pending |
-| LIBR-02 | Phase 1 | Pending |
-| LIBR-03 | Phase 1 | Pending |
-| LIBR-04 | Phase 1 | Pending |
-| LIBR-05 | Phase 1 | Pending |
+| LIBR-01 | Phase 1 | Complete |
+| LIBR-02 | Phase 1 | Complete |
+| LIBR-03 | Phase 1 | Complete |
+| LIBR-04 | Phase 1 | Complete |
+| LIBR-05 | Phase 1 | Complete |
 
 ### Phase 2: Safety Gates
 

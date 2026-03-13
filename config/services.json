@@ -1,0 +1,82 @@
+{
+  "disabled": [
+    {"name": "DiagTrack", "reason": "Microsoft telemetry data collection service"},
+    {"name": "dmwappushservice", "reason": "Windows Push Messaging User Data Service (telemetry)"},
+    {"name": "MapsBroker", "reason": "Downloaded Maps Manager - unused for development workstations"},
+    {"name": "RetailDemo", "reason": "Retail Demo mode service - not needed"},
+    {"name": "WerSvc", "reason": "Windows Error Reporting - can be disabled"},
+    {"name": "wisvc", "reason": "Windows Insider Service - not needed"},
+    {"name": "NvTelemetryContainer", "reason": "Nvidia telemetry container service"}
+  ],
+  "manual": [
+    {"name": "SysMain", "reason": "Superfetch/Prefetch - conditionally disabled in File System module for NVMe"},
+    {"name": "WSearch", "reason": "Windows Search - configured with exclusions, not fully disabled"},
+    {"name": "lfsvc", "reason": "Geolocation Service - rarely needed"},
+    {"name": "PeerDistSvc", "reason": "BranchCache - not needed for single-user workstation"},
+    {"name": "SharedAccess", "reason": "Internet Connection Sharing - rarely needed"},
+    {"name": "PrintNotify", "reason": "Print spooler notification - not needed if no printer"},
+    {"name": "icssvc", "reason": "Windows Mobile Hotspot - rarely needed"},
+    {"name": "NcdAutoSetup", "reason": "Network Connection Auto-Setup - not needed"},
+    {"name": "PhoneSvc", "reason": "Phone Service - not needed"},
+    {"name": "RmSvc", "reason": "Radio Management - rarely needed"}
+  ],
+  "oem": {
+    "asus": [
+      {
+        "name": "ArmouryCrate.Service",
+        "displayName": "ASUS Armoury Crate Service",
+        "detectionPattern": {"type": "Service", "query": "Get-Service ArmouryCrate.Service -ErrorAction SilentlyContinue"},
+        "countermeasure": "PowerPlanReassertion",
+        "description": "Reasserts ASUS power plan at boot; requires scheduled task countermeasure"
+      },
+      {
+        "name": "ASUSOptimization",
+        "displayName": "ASUS Optimization Service",
+        "detectionPattern": {"type": "Service", "query": "Get-Service ASUSOptimization -ErrorAction SilentlyContinue"},
+        "countermeasure": "PowerPlanReassertion",
+        "description": "ASUS power management override service"
+      }
+    ],
+    "lenovo": [
+      {
+        "name": "LenovoVantage",
+        "displayName": "Lenovo Vantage Service",
+        "detectionPattern": {"type": "Service", "query": "Get-Service LenovoVantage -ErrorAction SilentlyContinue"},
+        "countermeasure": "PowerPlanReassertion",
+        "description": "Lenovo power management override service"
+      }
+    ],
+    "dell": [
+      {
+        "name": "DellCommandCenter",
+        "displayName": "Dell Command Center",
+        "detectionPattern": {"type": "Service", "query": "Get-Service DellCommandCenter -ErrorAction SilentlyContinue"},
+        "countermeasure": "PowerPlanReassertion",
+        "description": "Dell power management override service"
+      }
+    ],
+    "hp": [
+      {
+        "name": "HP Omen Gaming Hub",
+        "displayName": "HP Omen Gaming Hub Service",
+        "detectionPattern": {"type": "Service", "query": "Get-Service 'HP Omen Gaming Hub' -ErrorAction SilentlyContinue"},
+        "countermeasure": "PowerPlanReassertion",
+        "description": "HP power management override service"
+      }
+    ]
+  },
+  "protected": [
+    {"name": "HvHost", "reason": "Hyper-V Host Service - CRITICAL for virtualization"},
+    {"name": "vmms", "reason": "Hyper-V Virtual Machine Management - CRITICAL for virtualization"},
+    {"name": "WslService", "reason": "WSL Service - CRITICAL for WSL2"},
+    {"name": "LxssManager", "reason": "WSL Lxss Manager - CRITICAL for WSL2"},
+    {"name": "VmCompute", "reason": "Hyper-V Compute Service - CRITICAL for virtualization"},
+    {"name": "vmic*", "reason": "All Hyper-V VM Integration Services - CRITICAL for VM functionality"}
+  ],
+  "metadata": {
+    "version": "1.0.0",
+    "lastUpdated": "2026-03-13",
+    "description": "Windows service configuration for WinOptimizer - Disabled, Manual, OEM, and Protected service lists",
+    "extensibility": "Users can add custom entries to disabled/manual lists. Protected list MUST NOT be modified."
+  }
+}

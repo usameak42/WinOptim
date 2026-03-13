@@ -317,6 +317,185 @@ function Invoke-SchedulerOptimize {
     }
     #endregion
 
+    #region Stage 4: Network Adapter Interrupt Moderation (SCHD-05)
+    Write-Host "`n[Stage 4/4] Network Adapter Interrupt Moderation" -ForegroundColor Cyan
+    Write-Host "-------------------------------------------" -ForegroundColor Cyan
+
+    #region Detect Network Adapters
+    try {
+        $adapters = Get-WmiObject -Class Win32_NetworkAdapter -ErrorAction SilentlyContinue |
+
+        Where-Object {
+            $_.Name -notmatch 'Virtual|Hyper-V|VMware|VirtualBox' -and
+            $_.AdapterTypeId -eq 0
+        }
+
+        if ($null -eq $adapters -or $adapters.Count -eq 0) {
+            Write-Host "[INFO] No physical network adapters detected" -ForegroundColor Cyan
+            Write-OptLog -Module $global:CurrentModule -Operation "Get-WmiObject" -Target "Win32_NetworkAdapter" -Values @{} -Result "Skip" -Message "No physical network adapters found" -Level "INFO"
+        }
+        else {
+            #region Initialize Configured Adapters Array
+            $configuredAdapters = @()
+            #endregion
+
+            #region Process Each Network Adapter
+            foreach ($adapter in $adapters) {
+                #region Extract Adapter Properties
+                $adapterName = $adapter.Name
+                $adapterGUID = $adapter.GUID
+                $adapterType = if ($adapter.AdapterTypeId -eq 0) { "Ethernet" }
+                                elseif ($adapter.AdapterTypeId -eq 9) { "Wi-Fi" }
+                                else { "Other" }
+
+                Write-Host "`n[ADAPTER] $adapterName ($adapterType)" -ForegroundColor White
+                Write-Host "GUID: $adapterGUID" -ForegroundColor Gray
+                #endregion
+
+                #region Search for Interrupt Moderation Registry Key
+                $regPath = "HKLM:\SYSTEM\CurrentControlSet\Control\Class\{4D36E972-E325-11CE-BFC1-08002BE10318}"
+                $keyPath = $null
+                $interruptModerationValue = $null
+
+                #region Enumerate Subkeys to Find Matching Adapter
+                $subkeys = Get-ChildItem -Path $regPath -ErrorAction SilentlyContinue |
+
+                Where-Object { $_.PSChildName -match '^\d{4}$' }
+
+                foreach ($subkey in $subkeys) {
+                    $subkeyPath = Join-Path -Path $regPath -ChildPath $subkey.PSChildName
+                    $subkeyProps = Get-ItemProperty -Path $subkeyPath -ErrorAction SilentlyContinue
+
+                    if ($null -ne $subkeyProps -and $subkeyProps.NetCfgInstanceId -eq $adapterGUID) {
+                        $keyPath = $subkeyPath
+
+                        #region Check for Interrupt Moderation Value
+                        $interruptModerationValue = Get-ItemProperty -Path $keyPath -Name "*InterruptModeration" -ErrorAction SilentlyContinue
+                        if ($null -eq $interruptModerationValue) {
+                            $interruptModerationValue = Get-ItemProperty -Path $keyPath -Name "*ITR" -ErrorAction SilentlyContinue
+                        }
+                        break
+                    }
+                }
+                #endregion
+
+                if ($null -eq $keyPath) {
+                    Write-Host "[SKIP] Interrupt moderation registry key not found for this adapter" -ForegroundColor Gray
+                    Write-OptLog -Module $global:CurrentModule -Operation "Registry Search" -Target "$regPath\*" -Values @{ AdapterGUID = $adapterGUID } -Result "Skip" -Message "Registry key not found" -Level "SKIP"
+                    $skipCount++
+                    continue
+                }
+
+                if ($null -eq $interruptModerationValue) {
+                    Write-Host "[SKIP] Interrupt moderation value not found for this adapter" -ForegroundColor Gray
+                    Write-OptLog -Module $global:CurrentModule -Operation "Get-ItemProperty" -Target $keyPath -Values @{ AdapterGUID = $adapterGUID } -Result "Skip" -Message "Interrupt moderation value not found" -Level "SKIP"
+                    $skipCount++
+                    continue
+                }
+                #endregion
+
+                #region Display Current Value and Explain Interrupt Moderation
+                $currentValue = if ($null -ne $interruptModerationValue."*InterruptModeration") { $interruptModerationValue."*InterruptModeration" }
+                                elseif ($null -ne $interruptModerationValue."*ITR") { $interruptModerationValue."*ITR" }
+                                else { $null }
+
+                Write-Host "[CURRENT] Interrupt Moderation: $currentValue" -ForegroundColor Cyan
+
+                Write-Host "`n[INFO] Interrupt Moderation Explanation:" -ForegroundColor Cyan
+                Write-Host "Interrupt moderation reduces CPU overhead by coalescing network interrupts." -ForegroundColor White
+                Write-Host "Disabling can reduce latency but may increase CPU usage." -ForegroundColor White
+                Write-Host "Enabling can improve CPU efficiency but may increase latency.`n" -ForegroundColor Yellow
+                #endregion
+
+                #region Prompt User for Interrupt Moderation Settings
+                $userChoice = Read-Host "Configure interrupt moderation for '$adapterName': Enable / Disable / Skip? (E/D/S)"
+
+                if ($userChoice -eq 'E' -or $userChoice -eq 'e') {
+                    #region Enable Interrupt Moderation
+                    try {
+                        #region Save Rollback Entry
+                        $valueName = if ($null -ne $interruptModerationValue."*InterruptModeration") { "*InterruptModeration" }
+                                      else { "*ITR" }
+
+                        Save-RollbackEntry -Type "Registry" -Target $keyPath -ValueName $valueName -OriginalData $currentValue -OriginalType "REG_DWORD"
+                        #endregion
+
+                        #region Apply Enable Value (typically 1 or 2, varies by adapter)
+                        $enableValue = 1
+
+                        Set-ItemProperty -Path $keyPath -Name $valueName -Value $enableValue -Type DWord -ErrorAction Stop
+
+                        Write-Host "[SUCCESS] Enabled interrupt moderation for '$adapterName'" -ForegroundColor Green
+                        Write-OptLog -Module $global:CurrentModule -Operation "Set-ItemProperty" -Target "$keyPath\$valueName" -Values @{ OldValue = $currentValue; NewValue = $enableValue; Adapter = $adapterName } -Result "Success" -Message "Interrupt moderation enabled" -Level "SUCCESS"
+                        $successCount++
+                        $configuredAdapters += $adapterName
+                        #endregion
+                    }
+                    catch {
+                        Write-Host "[ERROR] Failed to enable interrupt moderation: $_" -ForegroundColor Red
+                        Write-OptLog -Module $global:CurrentModule -Operation "Set-ItemProperty" -Target "$keyPath\$valueName" -Values @{ Adapter = $adapterName } -Result "Error" -Message $_.Exception.Message -Level "ERROR"
+                        $errorCount++
+                    }
+                    #endregion
+                }
+                elseif ($userChoice -eq 'D' -or $userChoice -eq 'd') {
+                    #region Disable Interrupt Moderation
+                    try {
+                        #region Save Rollback Entry
+                        $valueName = if ($null -ne $interruptModerationValue."*InterruptModeration") { "*InterruptModeration" }
+                                      else { "*ITR" }
+
+                        Save-RollbackEntry -Type "Registry" -Target $keyPath -ValueName $valueName -OriginalData $currentValue -OriginalType "REG_DWORD"
+                        #endregion
+
+                        #region Apply Disable Value (typically 0)
+                        $disableValue = 0
+
+                        Set-ItemProperty -Path $keyPath -Name $valueName -Value $disableValue -Type DWord -ErrorAction Stop
+
+                        Write-Host "[SUCCESS] Disabled interrupt moderation for '$adapterName'" -ForegroundColor Green
+                        Write-OptLog -Module $global:CurrentModule -Operation "Set-ItemProperty" -Target "$keyPath\$valueName" -Values @{ OldValue = $currentValue; NewValue = $disableValue; Adapter = $adapterName } -Result "Success" -Message "Interrupt moderation disabled" -Level "SUCCESS"
+                        $successCount++
+                        $configuredAdapters += $adapterName
+                        #endregion
+                    }
+                    catch {
+                        Write-Host "[ERROR] Failed to disable interrupt moderation: $_" -ForegroundColor Red
+                        Write-OptLog -Module $global:CurrentModule -Operation "Set-ItemProperty" -Target "$keyPath\$valueName" -Values @{ Adapter = $adapterName } -Result "Error" -Message $_.Exception.Message -Level "ERROR"
+                        $errorCount++
+                    }
+                    #endregion
+                }
+                else {
+                    Write-Host "[SKIP] User declined interrupt moderation configuration for '$adapterName'" -ForegroundColor Gray
+                    Write-OptLog -Module $global:CurrentModule -Operation "User Prompt" -Target "$keyPath" -Values @{ Adapter = $adapterName } -Result "Skip" -Message "User declined interrupt moderation configuration" -Level "SKIP"
+                    $skipCount++
+                }
+                #endregion
+            }
+            #endregion
+
+            #region Display Summary of Configured Adapters
+            Write-Host "`n[Stage 4 Summary]" -ForegroundColor Cyan
+            if ($configuredAdapters.Count -gt 0) {
+                Write-Host "[INFO] Configured interrupt moderation for $($configuredAdapters.Count) adapter(s):" -ForegroundColor Cyan
+                foreach ($adapter in $configuredAdapters) {
+                    Write-Host "  - $adapter" -ForegroundColor White
+                }
+            }
+            else {
+                Write-Host "[INFO] No network adapters configured for interrupt moderation" -ForegroundColor Cyan
+            }
+            #endregion
+        }
+    }
+    catch {
+        Write-Host "[ERROR] Failed to detect network adapters: $_" -ForegroundColor Red
+        Write-OptLog -Module $global:CurrentModule -Operation "Get-WmiObject" -Target "Win32_NetworkAdapter" -Values @{} -Result "Error" -Message $_.Exception.Message -Level "ERROR"
+        $errorCount++
+    }
+    #endregion
+
     #region End Block: Display Summary
     $stopwatch.Stop()
 

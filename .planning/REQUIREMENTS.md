@@ -61,11 +61,11 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Service Module (Invoke-ServiceOptimize)
 
-- [ ] **SRVC-01**: Script can disable DiagTrack, dmwappushservice, MapsBroker, RetailDemo, WerSvc, wisvc, NvTelemetryContainer services
-- [ ] **SRVC-02**: Script can set SysMain, WSearch, lfsvc, PeerDistSvc, SharedAccess, PrintNotify, icssvc, NcdAutoSetup, PhoneSvc, RmSvc to Manual startup
-- [ ] **SRVC-03**: Script validates protected services (HvHost, vmms, WslService, LxssManager, VmCompute, vmic*) remain untouched
-- [ ] **SRVC-04**: Module logs prior StartType of each service for rollback
-- [ ] **SRVC-05**: Module gracefully skips services not found without halting
+- [x] **SRVC-01**: Script can disable DiagTrack, dmwappushservice, MapsBroker, RetailDemo, WerSvc, wisvc, NvTelemetryContainer services
+- [x] **SRVC-02**: Script can set SysMain, WSearch, lfsvc, PeerDistSvc, SharedAccess, PrintNotify, icssvc, NcdAutoSetup, PhoneSvc, RmSvc to Manual startup
+- [x] **SRVC-03**: Script validates protected services (HvHost, vmms, WslService, LxssManager, VmCompute, vmic*) remain untouched
+- [x] **SRVC-04**: Module logs prior StartType of each service for rollback
+- [x] **SRVC-05**: Module gracefully skips services not found without halting
 
 ### Rollback Module (Invoke-Rollback)
 
@@ -183,11 +183,11 @@ Which phases cover which requirements. Updated during roadmap creation.
 | GPUD-03 | Phase 3 | Pending |
 | GPUD-04 | Phase 3 | Pending |
 | GPUD-05 | Phase 3 | Pending |
-| SRVC-01 | Phase 3 | Pending |
-| SRVC-02 | Phase 3 | Pending |
-| SRVC-03 | Phase 3 | Pending |
-| SRVC-04 | Phase 3 | Pending |
-| SRVC-05 | Phase 3 | Pending |
+| SRVC-01 | Phase 3 | Complete |
+| SRVC-02 | Phase 3 | Complete |
+| SRVC-03 | Phase 3 | Complete |
+| SRVC-04 | Phase 3 | Complete |
+| SRVC-05 | Phase 3 | Complete |
 
 ### Phase 4: Power & Scheduler
 

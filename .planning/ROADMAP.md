@@ -115,7 +115,9 @@
 5. Scheduler module disables CPU core parking and sets processor states to 100% using hardcoded GUIDs (no locale-sensitive aliases)
 6. All power plan operations use regex GUID extraction (Get-ActivePlanGuid) for locale safety
 
-**Plans:** TBD
+**Plans:** 2 plans
+- [ ] 04-01-PLAN.md — Power plan configuration module (PWRP-01 through PWRP-08)
+- [ ] 04-02-PLAN.md — CPU scheduler optimization module (SCHD-01 through SCHD-05)
 
 ---
 

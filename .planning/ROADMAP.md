@@ -70,7 +70,10 @@
 3. Script creates named System Restore Point before any module execution and halts on failure
 4. Script validates WSL2 and Hyper-V state via WMI before and after all operations (never wsl.exe)
 
-**Plans:** TBD
+**Plans:** 3 plans
+- [ ] 02-01-PLAN.md — Administrator elevation detection and PowerShell version validation
+- [ ] 02-02-PLAN.md — System Restore Point creation with recent point detection
+- [ ] 02-03-PLAN.md — Virtualization stack validation (pre-flight and post-flight)
 
 ---
 

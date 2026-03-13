@@ -74,7 +74,7 @@ Each task was committed atomically:
 
 1. **Task 1 & 2: Create Invoke-PowerPlanConfig module structure with S0 detection, plan duplication, PCIe/USB settings, and OEM countermeasures** - `c5d9b54` (feat)
 
-**Plan metadata:** Pending final metadata commit
+**Plan metadata:** `bfc9220` (docs: complete power plan configuration plan)
 
 _Note: Tasks 1 and 2 implemented together for module cohesion and completeness_
 

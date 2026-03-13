@@ -9,7 +9,7 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Safety Gates
 
-- [ ] **SAFE-01**: Script can create a named System Restore Point before any module executes (halts on failure)
+- [x] **SAFE-01**: Script can create a named System Restore Point before any module executes (halts on failure)
 - [ ] **SAFE-02**: Script verifies Administrator elevation and self-relaunches if not elevated
 - [ ] **SAFE-03**: Script validates PowerShell 5.1+ version before execution
 - [x] **SAFE-04**: Script validates WSL2 and Hyper-V feature state via WMI before all changes and re-validates after
@@ -164,7 +164,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| SAFE-01 | Phase 2 | Pending |
+| SAFE-01 | Phase 2 | Complete |
 | SAFE-02 | Phase 2 | Pending |
 | SAFE-03 | Phase 2 | Pending |
 | SAFE-04 | Phase 2 | Complete |

@@ -92,7 +92,10 @@
 4. All modules record prior state to rollback manifest before making changes
 5. All modules emit structured JSONL log entries for every operation
 
-**Plans:** TBD
+**Plans:** 3 plans
+- [ ] 03-01-PLAN.md — Telemetry suppression module (TELM-01 through TELM-05)
+- [ ] 03-02-PLAN.md — GPU/DWM optimization module (GPUD-01 through GPUD-05)
+- [ ] 03-03-PLAN.md — Service optimization module (SRVC-01 through SRVC-05)
 
 ---
 

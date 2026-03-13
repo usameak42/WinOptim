@@ -113,7 +113,7 @@ Requirements for initial release. Each maps to roadmap phases.
 - [ ] **REPO-02**: README.md follows structure defined in PRD Section 3.5
 - [ ] **REPO-03**: config/services.json contains Disabled list, Manual list, and OEM entries (Armory Crate, Lenovo Vantage, Dell Command, HP Omen)
 - [ ] **REPO-04**: tests/ directory contains Pester stubs for Test-Modules.ps1 and Test-Rollback.ps1
-- [ ] **REPO-05]: CONTRIBUTING.md documents PR guidelines, module addition template, test requirements, code style ban on backtick continuation
+- [ ] **REPO-05**: CONTRIBUTING.md documents PR guidelines, module addition template, test requirements, code style ban on backtick continuation
 - [ ] **REPO-06**: CHANGELOG.md includes v1.0.0 initial release entry
 - [ ] **REPO-07**: .github/ISSUE_TEMPLATE/ contains bug_report.md and feature_request.md
 
@@ -148,19 +148,121 @@ Explicitly excluded. Documented to prevent scope creep.
 
 Which phases cover which requirements. Updated during roadmap creation.
 
+### Phase 1: Foundation & Libraries
+
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| SAFE-01 | Phase 1 | Pending |
-| SAFE-02 | Phase 1 | Pending |
-| SAFE-03 | Phase 1 | Pending |
-| SAFE-04 | Phase 1 | Pending |
-| All other requirements | TBD | Pending |
+| REPO-01 | Phase 1 | Pending |
+| REPO-03 | Phase 1 | Pending |
+| LIBR-01 | Phase 1 | Pending |
+| LIBR-02 | Phase 1 | Pending |
+| LIBR-03 | Phase 1 | Pending |
+| LIBR-04 | Phase 1 | Pending |
+| LIBR-05 | Phase 1 | Pending |
+
+### Phase 2: Safety Gates
+
+| Requirement | Phase | Status |
+|-------------|-------|--------|
+| SAFE-01 | Phase 2 | Pending |
+| SAFE-02 | Phase 2 | Pending |
+| SAFE-03 | Phase 2 | Pending |
+| SAFE-04 | Phase 2 | Pending |
+
+### Phase 3: Core Modules
+
+| Requirement | Phase | Status |
+|-------------|-------|--------|
+| TELM-01 | Phase 3 | Pending |
+| TELM-02 | Phase 3 | Pending |
+| TELM-03 | Phase 3 | Pending |
+| TELM-04 | Phase 3 | Pending |
+| TELM-05 | Phase 3 | Pending |
+| GPUD-01 | Phase 3 | Pending |
+| GPUD-02 | Phase 3 | Pending |
+| GPUD-03 | Phase 3 | Pending |
+| GPUD-04 | Phase 3 | Pending |
+| GPUD-05 | Phase 3 | Pending |
+| SRVC-01 | Phase 3 | Pending |
+| SRVC-02 | Phase 3 | Pending |
+| SRVC-03 | Phase 3 | Pending |
+| SRVC-04 | Phase 3 | Pending |
+| SRVC-05 | Phase 3 | Pending |
+
+### Phase 4: Power & Scheduler
+
+| Requirement | Phase | Status |
+|-------------|-------|--------|
+| SCHD-01 | Phase 4 | Pending |
+| SCHD-02 | Phase 4 | Pending |
+| SCHD-03 | Phase 4 | Pending |
+| SCHD-04 | Phase 4 | Pending |
+| SCHD-05 | Phase 4 | Pending |
+| PWRP-01 | Phase 4 | Pending |
+| PWRP-02 | Phase 4 | Pending |
+| PWRP-03 | Phase 4 | Pending |
+| PWRP-04 | Phase 4 | Pending |
+| PWRP-05 | Phase 4 | Pending |
+| PWRP-06 | Phase 4 | Pending |
+| PWRP-07 | Phase 4 | Pending |
+| PWRP-08 | Phase 4 | Pending |
+
+### Phase 5: File System & Rollback
+
+| Requirement | Phase | Status |
+|-------------|-------|--------|
+| FSYS-01 | Phase 5 | Pending |
+| FSYS-02 | Phase 5 | Pending |
+| FSYS-03 | Phase 5 | Pending |
+| FSYS-04 | Phase 5 | Pending |
+| FSYS-05 | Phase 5 | Pending |
+| FSYS-06 | Phase 5 | Pending |
+| FSYS-07 | Phase 5 | Pending |
+| ROLL-01 | Phase 5 | Pending |
+| ROLL-02 | Phase 5 | Pending |
+| ROLL-03 | Phase 5 | Pending |
+| ROLL-04 | Phase 5 | Pending |
+| ROLL-05 | Phase 5 | Pending |
+
+### Phase 6: Entry Point & CLI
+
+| Requirement | Phase | Status |
+|-------------|-------|--------|
+| CLIE-01 | Phase 6 | Pending |
+| CLIE-02 | Phase 6 | Pending |
+| CLIE-03 | Phase 6 | Pending |
+| CLIE-04 | Phase 6 | Pending |
+| CLIE-05 | Phase 6 | Pending |
+| CLIE-06 | Phase 6 | Pending |
+| CLIE-07 | Phase 6 | Pending |
+
+### Phase 7: Quality & Documentation
+
+| Requirement | Phase | Status |
+|-------------|-------|--------|
+| QUAL-01 | Phase 7 | Pending |
+| QUAL-02 | Phase 7 | Pending |
+| QUAL-03 | Phase 7 | Pending |
+| QUAL-04 | Phase 7 | Pending |
+| QUAL-05 | Phase 7 | Pending |
+| QUAL-06 | Phase 7 | Pending |
+| QUAL-07 | Phase 7 | Pending |
+| QUAL-08 | Phase 7 | Pending |
+| QUAL-09 | Phase 7 | Pending |
+| QUAL-10 | Phase 7 | Pending |
+| QUAL-11 | Phase 7 | Pending |
+| REPO-02 | Phase 7 | Pending |
+| REPO-04 | Phase 7 | Pending |
+| REPO-05 | Phase 7 | Pending |
+| REPO-06 | Phase 7 | Pending |
+| REPO-07 | Phase 7 | Pending |
 
 **Coverage:**
 - v1 requirements: 56 total
-- Mapped to phases: 4 (Safety Gates)
-- Unmapped: 52 ⚠️ (Roadmap will complete mapping)
+- Mapped to phases: 56 (100%) ✓
+- Unmapped: 0
+- Orphaned: 0
 
 ---
 *Requirements defined: 2025-03-13*
-*Last updated: 2025-03-13 after initial definition*
+*Last updated: 2026-03-13 after roadmap creation*

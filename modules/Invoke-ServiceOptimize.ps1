@@ -218,7 +218,7 @@ function Invoke-ServiceOptimize {
                 }
                 catch {
                     # CONTEXT: Service Stop Timeout - Prompt user to force kill or skip
-                    Write-Host "[ERROR] Failed to stop $serviceName: $_" -ForegroundColor Red
+                    Write-Host "[ERROR] Failed to stop ${serviceName}: $_" -ForegroundColor Red
                     $forceKill = Read-Host -Prompt "Force kill service process? (Y/N)"
                     if ($forceKill -eq 'Y' -or $forceKill -eq 'y') {
                         # Force kill logic using Stop-Process
@@ -230,7 +230,7 @@ function Invoke-ServiceOptimize {
                             }
                         }
                         catch {
-                            Write-Host "[ERROR] Failed to force kill $serviceName: $_" -ForegroundColor Red
+                            Write-Host "[ERROR] Failed to force kill ${serviceName}: $_" -ForegroundColor Red
                             $errorCount++
                             continue
                         }
@@ -259,7 +259,7 @@ function Invoke-ServiceOptimize {
             }
             catch {
                 # CONTEXT: Service Disable Failures - Prompt user to continue or halt
-                Write-Host "[ERROR] Failed to disable $serviceName: $_" -ForegroundColor Red
+                Write-Host "[ERROR] Failed to disable ${serviceName}: $_" -ForegroundColor Red
 
                 Write-OptLog -Module "Invoke-ServiceOptimize" `
                     -Operation "Set-Service" `

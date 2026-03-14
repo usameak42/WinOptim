@@ -277,7 +277,7 @@ function Invoke-TelemetryBlock {
                     Write-Host "[SUCCESS] Stopped service $serviceName" -ForegroundColor Green
                 }
                 catch {
-                    Write-Host "[ERROR] Failed to stop $serviceName: $_" -ForegroundColor Red
+                    Write-Host "[ERROR] Failed to stop ${serviceName}: $_" -ForegroundColor Red
 
                     # CONTEXT: Service stop timeout - prompt user
                     $forceKill = Read-Host -Prompt "Force kill service process? (Y/N)"
@@ -290,7 +290,7 @@ function Invoke-TelemetryBlock {
                             }
                         }
                         catch {
-                            Write-Host "[ERROR] Failed to force kill $serviceName: $_" -ForegroundColor Red
+                            Write-Host "[ERROR] Failed to force kill ${serviceName}: $_" -ForegroundColor Red
                             $errorCount++
                             continue
                         }
@@ -318,7 +318,7 @@ function Invoke-TelemetryBlock {
                 $successCount++
             }
             catch {
-                Write-Host "[ERROR] Failed to disable $serviceName: $_" -ForegroundColor Red
+                Write-Host "[ERROR] Failed to disable ${serviceName}: $_" -ForegroundColor Red
 
                 Write-OptLog -Module "Invoke-TelemetryBlock" `
                     -Operation "Set-Service" `

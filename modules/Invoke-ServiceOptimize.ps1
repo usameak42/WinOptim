@@ -358,9 +358,14 @@ function Invoke-ServiceOptimize {
             Write-Host "[ACTION] Setting service to Manual: $serviceName" -ForegroundColor Cyan
 
             # SRVC-04: Save rollback entry BEFORE modification
+            # Map WMI StartMode ("Auto") to PowerShell StartType ("Automatic")
+            $mappedStartType = switch ($currentStartType) {
+                "Auto" { "Automatic" }
+                default { $currentStartType }
+            }
             Save-RollbackEntry -Type "Service" `
                 -Target $serviceName `
-                -OriginalStartType $currentStartType
+                -OriginalStartType $mappedStartType
 
             # Set service to Manual
             try {

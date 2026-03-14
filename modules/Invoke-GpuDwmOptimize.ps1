@@ -373,9 +373,14 @@ function Invoke-GpuDwmOptimize {
                                 Write-Host "[ACTION] Disabling NvTelemetryContainer service..." -ForegroundColor Cyan
 
                                 # Save rollback entry
+                                # Map WMI StartMode ("Auto") to PowerShell StartType ("Automatic")
+                                $mappedStartType = switch ($currentStartType) {
+                                    "Auto" { "Automatic" }
+                                    default { $currentStartType }
+                                }
                                 Save-RollbackEntry -Type "Service" `
                                     -Target 'NvTelemetryContainer' `
-                                    -OriginalStartType $currentStartType
+                                    -OriginalStartType $mappedStartType
 
                                 # Stop service
                                 if ($nvTelemetry.Status -ne 'Stopped') {

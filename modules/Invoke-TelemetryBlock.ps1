@@ -275,9 +275,14 @@ function Invoke-TelemetryBlock {
             }
 
             # Save rollback entry BEFORE modification
+            # Map WMI StartMode ("Auto") to PowerShell StartType ("Automatic")
+            $mappedStartType = switch ($currentStartType) {
+                "Auto" { "Automatic" }
+                default { $currentStartType }
+            }
             Save-RollbackEntry -Type "Service" `
                 -Target $serviceName `
-                -OriginalStartType $currentStartType
+                -OriginalStartType $mappedStartType
 
             # Stop service if running
             if ($service.Status -ne 'Stopped') {

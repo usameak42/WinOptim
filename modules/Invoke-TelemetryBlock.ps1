@@ -14,11 +14,11 @@ function Invoke-TelemetryBlock {
     [OutputType([bool])]
     param()
 
-    # Dot-source lib helpers
-    . $PSScriptRoot\..\lib\Write-OptLog.ps1
-    . $PSScriptRoot\..\lib\Save-RollbackEntry.ps1
-
     begin {
+        # Dot-source lib helpers
+        . $PSScriptRoot\..\lib\Write-OptLog.ps1
+        . $PSScriptRoot\..\lib\Save-RollbackEntry.ps1
+
         # Initialize logging paths
         $tempDir = Join-Path -Path $env:TEMP -ChildPath "WinOptimizer"
         if (-not (Test-Path -Path $tempDir)) {

@@ -216,9 +216,14 @@ function Invoke-ServiceOptimize {
 
             # SRVC-04: Log prior StartType of each service for rollback
             # Save rollback entry BEFORE modification (QUAL-02 requirement)
+            # Map WMI StartMode ("Auto") to PowerShell StartType ("Automatic")
+            $mappedStartType = switch ($currentStartType) {
+                "Auto" { "Automatic" }
+                default { $currentStartType }
+            }
             Save-RollbackEntry -Type "Service" `
                 -Target $serviceName `
-                -OriginalStartType $currentStartType
+                -OriginalStartType $mappedStartType
 
             # Attempt to stop service if running
             if ($service.Status -ne 'Stopped') {

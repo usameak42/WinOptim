@@ -133,8 +133,15 @@ function Invoke-PowerPlanConfig {
         $existingPlan = $existingOutput | Select-String -Pattern $customPlanName
 
         if ($existingPlan) {
-            # Extract existing plan GUID
-            $existingGuid = ($existingPlan | Select-String -Pattern '([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})').Matches.Value
+            # Extract existing plan GUID (case-insensitive pattern for A-F/a-f)
+            $existingGuid = ($existingPlan | Select-String -Pattern '([a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12})').Matches.Value
+
+            if ([string]::IsNullOrEmpty($existingGuid)) {
+                Write-Host "[ERROR] Failed to extract GUID from existing plan" -ForegroundColor Red
+                Write-OptLog -Module "Invoke-PowerPlanConfig" -Operation "powercfg /list" -Target $customPlanName -Values @{ RawOutput = $existingPlan } -Result "Error" -Message "Failed to extract existing plan GUID" -Level "ERROR"
+                $errorCount++
+                return $false
+            }
 
             Write-Host "[WARNING] Plan '$customPlanName' already exists (GUID: $existingGuid)" -ForegroundColor Yellow
             $choice = Read-Host -Prompt "Reuse existing / Delete and recreate / Cancel? (R/D/C)"
@@ -190,10 +197,10 @@ function Invoke-PowerPlanConfig {
                 }
             }
 
-            # Extract new GUID from output
-            $planGuid = ($dupOutput | Select-String -Pattern '([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})').Matches.Value
+            # Extract new GUID from output (case-insensitive pattern for A-F/a-f)
+            $planGuid = ($dupOutput | Select-String -Pattern '([a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12})').Matches.Value
 
-            if ($null -eq $planGuid) {
+            if ([string]::IsNullOrEmpty($planGuid)) {
                 Write-Host "[ERROR] Failed to extract GUID from powercfg output" -ForegroundColor Red
                 Write-OptLog -Module "Invoke-PowerPlanConfig" -Operation "powercfg /duplicatescheme" -Target "GUID extraction" -Values @{ RawOutput = $dupOutput } -Result "Error" -Message "Failed to extract new plan GUID" -Level "ERROR"
                 $errorCount++

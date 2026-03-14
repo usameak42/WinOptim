@@ -133,8 +133,8 @@ function Invoke-PowerPlanConfig {
         $existingPlan = $existingOutput | Select-String -Pattern $customPlanName
 
         if ($existingPlan) {
-            # Extract existing plan GUID (case-insensitive pattern for A-F/a-f, with curly braces)
-            $existingGuid = ($existingPlan | Select-String -Pattern '\{[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}\}').Matches.Value
+            # Extract existing plan GUID (case-insensitive pattern for A-F/a-f, no braces in powercfg output)
+            $existingGuid = ($existingPlan.Line | Select-String -Pattern '[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}').Matches[0].Value
 
             if ([string]::IsNullOrEmpty($existingGuid)) {
                 Write-Host "[ERROR] Failed to extract GUID from existing plan" -ForegroundColor Red
@@ -197,8 +197,8 @@ function Invoke-PowerPlanConfig {
                 }
             }
 
-            # Extract new GUID from output (case-insensitive pattern for A-F/a-f, with curly braces)
-            $planGuid = ($dupOutput | Select-String -Pattern '\{[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}\}').Matches.Value
+            # Extract new GUID from output (case-insensitive pattern for A-F/a-f, no braces in powercfg output)
+            $planGuid = ($dupOutput | Select-String -Pattern '[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}').Matches[0].Value
 
             if ([string]::IsNullOrEmpty($planGuid)) {
                 Write-Host "[ERROR] Failed to extract GUID from powercfg output" -ForegroundColor Red

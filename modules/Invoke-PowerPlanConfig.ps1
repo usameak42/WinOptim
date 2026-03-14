@@ -41,6 +41,16 @@ function Invoke-PowerPlanConfig {
     $stopwatch = [System.Diagnostics.Stopwatch]::StartNew()
     $global:CurrentModule = "Invoke-PowerPlanConfig"
 
+    # Initialize logging paths
+    $tempDir = Join-Path -Path $env:TEMP -ChildPath "WinOptimizer"
+    if (-not (Test-Path -Path $tempDir)) {
+        New-Item -Path $tempDir -ItemType Directory -Force | Out-Null
+    }
+    $timestamp = Get-Date -Format "yyyyMMdd-HHmmss"
+    $global:LogPath = Join-Path -Path $tempDir -ChildPath "WinOptimizer-${timestamp}.jsonl"
+    $global:RollbackPath = Join-Path -Path $tempDir -ChildPath "Rollback.jsonl"
+    #endregion
+
     Write-Host "`n========================================" -ForegroundColor Cyan
     Write-Host " WinOptimizer Power Plan Configuration" -ForegroundColor Cyan
     Write-Host "========================================`n" -ForegroundColor Cyan
@@ -255,24 +265,32 @@ function Invoke-PowerPlanConfig {
             return $false
         }
 
-        # Configure PCIe Link State Power Management to Off
+        # Configure PCIe Link State Power Management to Off (if available)
         $pciRegPath = "HKLM:\SYSTEM\CurrentControlSet\Control\Power\PowerSettings\$pciSubGroup\$pciLinkStatePower"
-        $pciCurrentValue = Get-ItemProperty -Path "$pciRegPath" -Name "ACValueIndex" -ErrorAction SilentlyContinue
 
-        # Save rollback entry BEFORE modification
-        Save-RollbackEntry -Type "Registry" -Target "$planGuid\$pciSubGroup" -ValueName $pciLinkStatePower -OriginalData $pciCurrentValue.ACValueIndex -OriginalType "REG_DWORD"
+        if (Test-Path -Path $pciRegPath -ErrorAction SilentlyContinue) {
+            $pciCurrentValue = Get-ItemProperty -Path "$pciRegPath" -Name "ACValueIndex" -ErrorAction SilentlyContinue
 
-        $pciOutput = powercfg /setacvalueindex $planGuid $pciSubGroup $pciLinkStatePower 0 2>&1
+            # Save rollback entry BEFORE modification
+            Save-RollbackEntry -Type "Registry" -Target "$planGuid\$pciSubGroup" -ValueName $pciLinkStatePower -OriginalData $pciCurrentValue.ACValueIndex -OriginalType "REG_DWORD"
 
-        if ($LASTEXITCODE -eq 0) {
-            Write-Host "[SUCCESS] Set PCIe Link State Power Management to Off" -ForegroundColor Green
-            Write-OptLog -Module "Invoke-PowerPlanConfig" -Operation "powercfg /setacvalueindex" -Target "$planGuid\$pciSubGroup\$pciLinkStatePower" -Values @{ OldValue = $pciCurrentValue.ACValueIndex; NewValue = 0 } -Result "Success" -Message "PCIe Link State Power Management disabled" -Level "SUCCESS"
-            $successCount++
+            $pciOutput = powercfg /setacvalueindex $planGuid $pciSubGroup $pciLinkStatePower 0 2>&1
+
+            if ($LASTEXITCODE -eq 0) {
+                Write-Host "[SUCCESS] Set PCIe Link State Power Management to Off" -ForegroundColor Green
+                Write-OptLog -Module "Invoke-PowerPlanConfig" -Operation "powercfg /setacvalueindex" -Target "$planGuid\$pciSubGroup\$pciLinkStatePower" -Values @{ OldValue = $pciCurrentValue.ACValueIndex; NewValue = 0 } -Result "Success" -Message "PCIe Link State Power Management disabled" -Level "SUCCESS"
+                $successCount++
+            }
+            else {
+                Write-Host "[ERROR] Failed to set PCIe power setting: $pciOutput" -ForegroundColor Red
+                Write-OptLog -Module "Invoke-PowerPlanConfig" -Operation "powercfg /setacvalueindex" -Target "$planGuid\$pciSubGroup\$pciLinkStatePower" -Values @{ Error = $pciOutput } -Result "Error" -Message "PCIe power setting failed" -Level "ERROR"
+                $errorCount++
+            }
         }
         else {
-            Write-Host "[ERROR] Failed to set PCIe power setting: $pciOutput" -ForegroundColor Red
-            Write-OptLog -Module "Invoke-PowerPlanConfig" -Operation "powercfg /setacvalueindex" -Target "$planGuid\$pciSubGroup\$pciLinkStatePower" -Values @{ Error = $pciOutput } -Result "Error" -Message "PCIe power setting failed" -Level "ERROR"
-            $errorCount++
+            Write-Host "[INFO] PCIe Link State Power Management setting not available on this system - skipping" -ForegroundColor Cyan
+            Write-OptLog -Module "Invoke-PowerPlanConfig" -Operation "Test-Path" -Target $pciRegPath -Values @{ Available = $false } -Result "Skip" -Message "PCIe power setting not available" -Level "INFO"
+            $skipCount++
         }
 
         # Configure USB Selective Suspend to Disabled

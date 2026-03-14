@@ -40,6 +40,15 @@ function Invoke-SchedulerOptimize {
     $errorCount = 0
     $stopwatch = [System.Diagnostics.Stopwatch]::StartNew()
     $global:CurrentModule = "Invoke-SchedulerOptimize"
+
+    # Initialize logging paths
+    $tempDir = Join-Path -Path $env:TEMP -ChildPath "WinOptimizer"
+    if (-not (Test-Path -Path $tempDir)) {
+        New-Item -Path $tempDir -ItemType Directory -Force | Out-Null
+    }
+    $timestamp = Get-Date -Format "yyyyMMdd-HHmmss"
+    $global:LogPath = Join-Path -Path $tempDir -ChildPath "WinOptimizer-${timestamp}.jsonl"
+    $global:RollbackPath = Join-Path -Path $tempDir -ChildPath "Rollback.jsonl"
     #endregion
 
     #region Module Header

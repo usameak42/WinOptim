@@ -19,6 +19,15 @@ function Invoke-TelemetryBlock {
     . $PSScriptRoot\..\lib\Save-RollbackEntry.ps1
 
     begin {
+        # Initialize logging paths
+        $tempDir = Join-Path -Path $env:TEMP -ChildPath "WinOptimizer"
+        if (-not (Test-Path -Path $tempDir)) {
+            New-Item -Path $tempDir -ItemType Directory -Force | Out-Null
+        }
+        $timestamp = Get-Date -Format "yyyyMMdd-HHmmss"
+        $global:LogPath = Join-Path -Path $tempDir -ChildPath "WinOptimizer-${timestamp}.jsonl"
+        $global:RollbackPath = Join-Path -Path $tempDir -ChildPath "Rollback.jsonl"
+
         # Initialize counters
         $successCount = 0
         $skipCount = 0
